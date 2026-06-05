@@ -1,0 +1,18 @@
+ruff
+mypy
+django
+sphinx
+pytest
+tox
+
+uv init
+uv add ruff
+uv add django
+
+# Create django project with name my_project_config in current directory
+uv run django-admin startproject project_name project_directory
+
+uv run python manage.py migrate
+uv run python manage.py runserver
+
+uv run python manage.py startapp blog
