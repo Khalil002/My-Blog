@@ -1,7 +1,20 @@
 from django.contrib import admin
+import datetime
+from django.utils import timezone
 
 # Register your models here.
 from .models import Post, Comment
 
-admin.site.register(Post)
-admin.site.register(Comment)
+class PostAdmin(admin.ModelAdmin):
+    # ...
+    search_fields = ["title"]
+    list_display = ["title", "pub_date", "was_published_recently"]
+
+class CommentAdmin(admin.ModelAdmin):
+    # ...
+    list_display = ["post", "author", "created_date"]
+
+admin.site.register(Post, PostAdmin)
+admin.site.register(Comment, CommentAdmin)
+
+
