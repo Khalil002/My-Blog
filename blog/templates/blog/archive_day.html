@@ -1,0 +1,29 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ year }}/{{ month }}/{{ day }} Archive - My Blog{% endblock %}
+
+{% block content %}
+    <h1 class="archive-title">{{ posts.0.pub_date|date:"F j, Y"|default:"" }}{% if not posts %}{{ year }}-{{ month }}-{{ day }}{% endif %}</h1>
+    <p class="archive-subnav">
+        <a href="{% url 'blog:archive_index' %}">All archives</a>
+        &middot;
+        <a href="{% url 'blog:archive_year' year %}">{{ year }}</a>
+        &middot;
+        <a href="{% url 'blog:archive_month' year month %}">{{ posts.0.pub_date|date:"F"|default:"Month" }}</a>
+    </p>
+
+    {% if posts %}
+        <ul class="post-list">
+        {% for post in posts %}
+            <li class="post-list-item">
+                <h2 class="post-list-title">
+                    <a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a>
+                </h2>
+                <p class="post-excerpt">{{ post.content|truncatewords:40 }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-state">No posts on this day.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ year }} Archive - My Blog{% endblock %}
+
+{% block content %}
+    <h1 class="archive-title">{{ year }}</h1>
+    <p class="archive-subnav">
+        <a href="{% url 'blog:archive_index' %}">&larr; All archives</a>
+        &middot; {{ post_count }} post{{ post_count|pluralize }}
+    </p>
+
+    {% if grouped %}
+        {% for group in grouped %}
+            <div class="archive-group">
+                <h2 class="archive-group-heading">
+                    <a href="{% url 'blog:archive_month' year group.month_date.month %}">
+                        {{ group.month_date|date:"F" }}
+                    </a>
+                </h2>
+                <ul class="archive-list">
+                {% for post in group.posts %}
+                    <li>
+                        <span class="archive-date">
+                            <a href="{% url 'blog:archive_day' year group.month_date.month post.pub_date.day %}">
+                                {{ post.pub_date|date:"M j" }}
+                            </a>
+                        </span>
+                        <a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+                {% if group.has_more %}
+                    <a class="archive-more" href="{% url 'blog:archive_month' year group.month_date.month %}">&hellip;</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="empty-state">No posts in {{ year }}.</p>
+    {% endif %}
+{% endblock %}

@@ -1,9 +1,25 @@
-{% if latest_post_list %}
-    <ul>
-    {% for post in latest_post_list %}
-        <li><a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No posts are available.</p>
-{% endif %}
+{% extends "blog/base.html" %}
+
+{% block title %}My Blog - Latest Posts{% endblock %}
+
+{% block content %}
+    {% if latest_post_list %}
+        <ul class="post-list">
+        {% for post in latest_post_list %}
+            <li class="post-list-item">
+                <h2 class="post-list-title">
+                    <a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a>
+                </h2>
+                <p class="post-meta">
+                    <a href="{% url 'blog:archive_day' post.pub_date.year post.pub_date.month post.pub_date.day %}">
+                        {{ post.pub_date|date:"F j, Y" }}
+                    </a>
+                </p>
+                <p class="post-excerpt">{{ post.content|truncatewords:40 }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-state">No posts are available yet.</p>
+    {% endif %}
+{% endblock %}

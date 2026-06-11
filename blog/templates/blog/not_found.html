@@ -1,0 +1,11 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Not Found - My Blog{% endblock %}
+
+{% block content %}
+    <div class="not-found">
+        <h1 class="not-found-title">404</h1>
+        <p class="not-found-message">{{ message }}</p>
+        <a class="not-found-link" href="{% url 'blog:index' %}">&larr; Back to home</a>
+    </div>
+{% endblock %}

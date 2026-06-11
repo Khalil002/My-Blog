@@ -1,2 +1,54 @@
-<h1>{{ post.title }}</h1>
-<p>{{ post.content }}</p>
+{% extends "blog/base.html" %}
+
+{% block title %}{{ post.title }} - My Blog{% endblock %}
+
+{% block content %}
+    <article>
+        <h1 class="post-title">{{ post.title }}</h1>
+        <p class="post-meta">
+            <a href="{% url 'blog:archive_day' post.pub_date.year post.pub_date.month post.pub_date.day %}">
+                {{ post.pub_date|date:"F j, Y" }}
+            </a>
+        </p>
+        <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+    </article>
+
+    <nav class="post-nav">
+        {% if prev_post %}
+            <a class="post-nav-link prev" href="{% url 'blog:detail' prev_post.id %}">
+                <span class="post-nav-label">&larr; Previous</span>
+                {{ prev_post.title }}
+            </a>
+        {% else %}
+            <span class="post-nav-spacer"></span>
+        {% endif %}
+
+        {% if next_post %}
+            <a class="post-nav-link next" href="{% url 'blog:detail' next_post.id %}">
+                <span class="post-nav-label">Next &rarr;</span>
+                {{ next_post.title }}
+            </a>
+        {% else %}
+            <span class="post-nav-spacer"></span>
+        {% endif %}
+    </nav>
+
+    <section class="comments-section">
+        <h2 class="comments-title">Comments ({{ comments|length }})</h2>
+        {% if comments %}
+            <ul class="comment-list">
+            {% for comment in comments %}
+                <li class="comment">
+                    <span class="comment-author">{{ comment.author }}</span>
+                    <span class="comment-date">{{ comment.created_date|date:"F j, Y, g:i a" }}</span>
+                    <p class="comment-text">{{ comment.text }}</p>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-state">No comments yet.</p>
+        {% endif %}
+    </section>
+{% endblock %}

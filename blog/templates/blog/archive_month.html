@@ -1,0 +1,55 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ year }}/{{ month }} Archive - My Blog{% endblock %}
+
+{% block content %}
+    <h1 class="archive-title">{{ posts.0.pub_date|date:"F Y"|default:"" }}{% if not posts %}{{ year }}-{{ month }}{% endif %}</h1>
+    <p class="archive-subnav">
+        <a href="{% url 'blog:archive_index' %}">All archives</a>
+        &middot;
+        <a href="{% url 'blog:archive_year' year %}">{{ year }}</a>
+    </p>
+
+    {% if posts %}
+        <ul class="archive-list">
+        {% for post in posts %}
+            <li>
+                <span class="archive-date">
+                    <a href="{% url 'blog:archive_day' year month post.pub_date.day %}">
+                        {{ post.pub_date|date:"M j, Y" }}
+                    </a>
+                </span>
+                <a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-state">No posts in this month.</p>
+    {% endif %}
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        <nav class="pagination">
+            {% if page_obj.has_previous %}
+                <a class="pagination-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Prev</a>
+            {% else %}
+                <span class="pagination-link disabled">&laquo; Prev</span>
+            {% endif %}
+
+            {% for item in page_links %}
+                {% if item == "..." %}
+                    <span class="pagination-link disabled">&hellip;</span>
+                {% elif item == page_obj.number %}
+                    <span class="pagination-link current">{{ item }}</span>
+                {% else %}
+                    <a class="pagination-link" href="?page={{ item }}">{{ item }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a class="pagination-link" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+            {% else %}
+                <span class="pagination-link disabled">Next &raquo;</span>
+            {% endif %}
+        </nav>
+    {% endif %}
+{% endblock %}

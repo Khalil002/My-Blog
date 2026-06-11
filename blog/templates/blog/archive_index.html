@@ -1,0 +1,19 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Archives - My Blog{% endblock %}
+
+{% block content %}
+    <h1 class="archive-title">Archives</h1>
+    {% if year_data %}
+        <div class="year-grid">
+        {% for entry in year_data %}
+            <a class="year-icon" href="{% url 'blog:archive_year' entry.year %}">
+                <span class="year-icon-year">{{ entry.year }}</span>
+                <span class="year-icon-count">{{ entry.display_count }} post{{ entry.count|pluralize }}</span>
+            </a>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No posts have been published yet.</p>
+    {% endif %}
+{% endblock %}
