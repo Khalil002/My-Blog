@@ -11,4 +11,19 @@ wheels/
 
 # Django db
 db.sqlite3
-db.sqlite3
+db.sqlite3-journal
+
+# Local text files / scratchpads
+notes.txt
+
+# Django assets and uploads
+media/
+staticfiles/
+
+# Environments and Secrets
+.env
+.env.*
+
+# Operating System files
+.DS_Store
+Thumbs.db
