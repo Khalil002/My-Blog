@@ -6,10 +6,20 @@ from django.utils import timezone
 
 
 # Create your models here.
+class PostManager(models.Manager):
+    """Default manager — transparently excludes soft-deleted posts."""
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
+
+
 class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     pub_date = models.DateTimeField("date published")
+    deleted = models.BooleanField(default=False)
+
+    objects = PostManager()          # excludes deleted (default)
+    all_objects = models.Manager()   # raw access when needed
 
     def __str__(self):
         return self.title
@@ -27,6 +37,8 @@ class Comment(models.Model):
     author = models.CharField(max_length=100)
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
+    deleted = models.BooleanField(default=False)
+    edited = models.BooleanField(default=False)
 
     def __str__(self):
         return self.text

@@ -7,7 +7,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from .forms import CommentForm, PostForm, RegisterForm
-from .models import Post
+from .models import Comment, Post
 
 POSTS_PER_MONTH_PREVIEW = 5
 POSTS_PER_PAGE = 10
@@ -219,7 +219,71 @@ def new_post(request):
     else:
         form = PostForm(initial={"pub_date": timezone.now()})
 
-    return render(request, "blog/post_form.html", {"form": form})
+    return render(request, "blog/post_form.html", {"form": form, "action": "new"})
+
+
+@user_passes_test(lambda user: user.is_superuser, login_url="blog:login")
+def edit_post(request, post_id):
+    if post_id > MAX_SAFE_INT:
+        return not_found(request, "This post does not exist.")
+    post = Post.objects.filter(pk=post_id).first()
+    if post is None:
+        return not_found(request, "This post does not exist.")
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect("blog:detail", post_id=post.id)
+    else:
+        form = PostForm(instance=post)
+    return render(request, "blog/post_form.html", {"form": form, "action": "edit", "post": post})
+
+
+@user_passes_test(lambda user: user.is_superuser, login_url="blog:login")
+def delete_post(request, post_id):
+    if post_id > MAX_SAFE_INT:
+        return not_found(request, "This post does not exist.")
+    post = Post.objects.filter(pk=post_id).first()
+    if post is None:
+        return not_found(request, "This post does not exist.")
+    if request.method != "POST":
+        return not_found(request, "This post does not exist.")
+    post.deleted = True
+    post.save()
+    return redirect("blog:index")
+
+
+def _can_modify_comment(user, comment):
+    return user.is_authenticated and (user.is_superuser or user.username == comment.author)
+
+
+def edit_comment(request, comment_id):
+    if comment_id > MAX_SAFE_INT:
+        return not_found(request, "This comment does not exist.")
+    comment = Comment.objects.filter(pk=comment_id, deleted=False).first()
+    if comment is None or not _can_modify_comment(request.user, comment):
+        return not_found(request, "This comment does not exist.")
+    if request.method != "POST":
+        return not_found(request, "This comment does not exist.")
+    text = request.POST.get("text", "").strip()
+    if text:
+        comment.text = text
+        comment.edited = True
+        comment.save()
+    return redirect("blog:detail", post_id=comment.post.id)
+
+
+def delete_comment(request, comment_id):
+    if comment_id > MAX_SAFE_INT:
+        return not_found(request, "This comment does not exist.")
+    comment = Comment.objects.filter(pk=comment_id, deleted=False).first()
+    if comment is None or not _can_modify_comment(request.user, comment):
+        return not_found(request, "This comment does not exist.")
+    if request.method != "POST":
+        return not_found(request, "This comment does not exist.")
+    comment.deleted = True
+    comment.save()
+    return redirect("blog:detail", post_id=comment.post.id)
 
 
 

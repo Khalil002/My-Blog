@@ -1,13 +1,13 @@
 {% extends "blog/base.html" %}
 
-{% block title %}Add New Post - {{ site_name }}{% endblock %}
+{% block title %}{% if action == "edit" %}Edit Post{% else %}Add New Post{% endif %} - {{ site_name }}{% endblock %}
 
 {% block content %}
-    <h1 class="post-title">Add New Post</h1>
+    <h1 class="post-title">{% if action == "edit" %}Edit Post{% else %}Add New Post{% endif %}</h1>
 
     <form class="auth-form" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button class="btn" type="submit">Publish</button>
+        <button class="btn" type="submit">{% if action == "edit" %}Save Changes{% else %}Publish{% endif %}</button>
     </form>
 {% endblock %}
