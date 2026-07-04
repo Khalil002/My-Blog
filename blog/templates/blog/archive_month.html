@@ -1,6 +1,6 @@
 {% extends "blog/base.html" %}
 
-{% block title %}{{ year }}/{{ month }} Archive - My Blog{% endblock %}
+{% block title %}{{ year }}/{{ month }} Archive - {{ site_name }}{% endblock %}
 
 {% block content %}
     <h1 class="archive-title">{{ posts.0.pub_date|date:"F Y"|default:"" }}{% if not posts %}{{ year }}-{{ month }}{% endif %}</h1>

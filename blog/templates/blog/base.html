@@ -4,16 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Blog{% endblock %}</title>
+    <title>{% block title %}{{ site_name }}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'blog/style.css' %}">
 </head>
 <body>
     <header class="site-header container">
         <div class="site-header-row">
-            <h1 class="site-title"><a href="{% url 'blog:index' %}">My Blog</a></h1>
+            <h1 class="site-title"><a href="{% url 'blog:index' %}">{{ site_name }}</a></h1>
             <nav class="site-nav">
                 <a href="{% url 'blog:index' %}">Home</a>
                 <a href="{% url 'blog:archive_index' %}">Archives</a>
+                <a href="{% url 'blog:about' %}">About</a>
+                {% if user.is_authenticated and user.is_superuser %}
+                    <a href="{% url 'blog:new_post' %}">Add New Post</a>
+                {% endif %}
+            </nav>
+            <nav class="site-nav site-nav-auth">
+                {% if user.is_authenticated %}
+                    <form class="logout-form" method="post" action="{% url 'blog:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="link-button">Log Out</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'blog:login' %}">Log In</a>
+                {% endif %}
             </nav>
         </div>
     </header>
@@ -23,7 +37,7 @@
     </main>
 
     <footer class="site-footer container">
-        <p>&copy; {% now "Y" %} My Blog. All rights reserved.</p>
+        <p>&copy; {% now "Y" %} {{ site_name }}. All rights reserved.</p>
     </footer>
 </body>
 </html>

@@ -20,7 +20,8 @@ from django.conf import settings
 
 
 urlpatterns = [
-    path("blog/", include("blog.urls")),
+    path("", include('blog.urls')), # This will include the URLs from the blog app at the root URL. You can change this to "blog/" if you want the blog to be accessible at /blog/ instead of /.
+    #path("blog/", include("blog.urls")),
     path('admin/', admin.site.urls),
 ]
 

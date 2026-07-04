@@ -1,6 +1,6 @@
 {% extends "blog/base.html" %}
 
-{% block title %}{{ post.title }} - My Blog{% endblock %}
+{% block title %}{{ post.title }} - {{ site_name }}{% endblock %}
 
 {% block content %}
     <article>
@@ -49,6 +49,21 @@
             </ul>
         {% else %}
             <p class="empty-state">No comments yet.</p>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <form class="comment-form" method="post">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button class="btn" type="submit">Post Comment</button>
+            </form>
+        {% else %}
+            <p class="empty-state">
+                <a href="{% url 'blog:login' %}?next={{ request.path }}">Log in</a>
+                or
+                <a href="{% url 'blog:register' %}">register</a>
+                to leave a comment.
+            </p>
         {% endif %}
     </section>
 {% endblock %}

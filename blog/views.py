@@ -1,8 +1,12 @@
 import calendar
 
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils import timezone
+
+from .forms import CommentForm, PostForm, RegisterForm
 from .models import Post
 
 POSTS_PER_MONTH_PREVIEW = 5
@@ -162,13 +166,60 @@ def detail(request, post_id):
         Post.objects.filter(pub_date__gt=post.pub_date,  pub_date__lte=timezone.now()).order_by("pub_date").first()
     )
 
+    comment_form = CommentForm()
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return redirect("blog:login")
+
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.author = request.user.username
+            comment.save()
+            return redirect("blog:detail", post_id=post.id)
+
     context = {
         "post": post,
         "comments": comments,
         "prev_post": prev_post,
         "next_post": next_post,
+        "comment_form": comment_form,
     }
     return render(request, "blog/detail.html", context)
+
+
+def about(request):
+    return render(request, "blog/about.html")
+
+
+def register(request):
+    if request.user.is_authenticated:
+        return redirect("blog:index")
+
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_login(request, user)
+            return redirect("blog:index")
+    else:
+        form = RegisterForm()
+
+    return render(request, "blog/register.html", {"form": form})
+
+
+@user_passes_test(lambda user: user.is_superuser, login_url="blog:login")
+def new_post(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save()
+            return redirect("blog:detail", post_id=post.id)
+    else:
+        form = PostForm(initial={"pub_date": timezone.now()})
+
+    return render(request, "blog/post_form.html", {"form": form})
 
 
 

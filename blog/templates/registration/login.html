@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Log In - {{ site_name }}{% endblock %}
+
+{% block content %}
+    <h1 class="post-title">Log In</h1>
+
+    <form class="auth-form" method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p class="form-error">Your username and password didn't match. Please try again.</p>
+        {% endif %}
+        {{ form.as_p }}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button class="btn" type="submit">Log In</button>
+    </form>
+
+    <p class="auth-switch">
+        Don't have an account? <a href="{% url 'blog:register' %}">Register here</a>.
+    </p>
+{% endblock %}

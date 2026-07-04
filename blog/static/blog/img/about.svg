@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Placeholder portrait illustration">
+    <rect width="600" height="400" fill="#ece4d6"/>
+    <circle cx="300" cy="160" r="80" fill="#d8cdb8"/>
+    <path d="M120 400c0-99.4 80.6-180 180-180s180 80.6 180 180" fill="#d8cdb8"/>
+    <text x="300" y="380" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#a64942">
+        Replace this image
+    </text>
+</svg>

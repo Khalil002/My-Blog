@@ -1,0 +1,31 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}About - {{ site_name }}{% endblock %}
+
+{% block content %}
+    <h1 class="post-title">About</h1>
+
+    <img class="about-photo" src="{% static 'blog/img/about.svg' %}" alt="A placeholder portrait">
+
+    <div class="post-content">
+        <p>
+            Hi, I'm Khalil — welcome to my personal blog! This is where I write about the
+            things I'm working on, things I'm learning, and anything else that's on my mind.
+        </p>
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+            nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </p>
+        <p>
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+            fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+            culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+        <p>
+            Feel free to look around, browse the archives, and leave a comment on any post
+            that catches your eye.
+        </p>
+    </div>
+{% endblock %}
