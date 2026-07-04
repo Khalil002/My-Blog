@@ -18,15 +18,20 @@ POSTS_PER_PAGE = 10
 # before they ever reach the database to avoid an OverflowError -> 500.
 MAX_SAFE_INT = 2**63 - 1
 
+
 def _earliest_year():
     """Return the earliest year that has a post, or None if there are no posts."""
     first = Post.objects.dates("pub_date", "year", order="ASC").first()
     return first.year if first else None
 
+
 def index(request):
-    latest_post_list = Post.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
+    latest_post_list = Post.objects.filter(pub_date__lte=timezone.now()).order_by(
+        "-pub_date"
+    )[:5]
     context = {"latest_post_list": latest_post_list}
     return render(request, "blog/index.html", context)
+
 
 def archive_index(request):
     """Top-level archive: list of years that have posts, with post counts."""
@@ -42,9 +47,11 @@ def archive_index(request):
     context = {"year_data": year_data}
     return render(request, "blog/archive_index.html", context)
 
+
 def not_found(request, message):
     """Render a friendly 'does not exist' page with a 404 status."""
     return render(request, "blog/not_found.html", {"message": message}, status=404)
+
 
 def archive_year(request, year):
     """All posts published in a given year, grouped by month."""
@@ -65,11 +72,13 @@ def archive_year(request, year):
     grouped = []
     for month_date in months:
         month_posts = [p for p in posts if p.pub_date.month == month_date.month]
-        grouped.append({
-            "month_date": month_date,
-            "posts": month_posts[:POSTS_PER_MONTH_PREVIEW],
-            "has_more": len(month_posts) > POSTS_PER_MONTH_PREVIEW,
-        })
+        grouped.append(
+            {
+                "month_date": month_date,
+                "posts": month_posts[:POSTS_PER_MONTH_PREVIEW],
+                "has_more": len(month_posts) > POSTS_PER_MONTH_PREVIEW,
+            }
+        )
 
     context = {
         "year": year,
@@ -77,6 +86,7 @@ def archive_year(request, year):
         "post_count": posts.count(),
     }
     return render(request, "blog/archive_year.html", context)
+
 
 def archive_month(request, year, month):
     """All posts published in a given year and month, paginated."""
@@ -91,9 +101,9 @@ def archive_month(request, year, month):
     if month < 1 or month > 12:
         return not_found(request, "The archive does not exist.")
 
-    posts = Post.objects.filter(
-        pub_date__year=year, pub_date__month=month
-    ).order_by("-pub_date")
+    posts = Post.objects.filter(pub_date__year=year, pub_date__month=month).order_by(
+        "-pub_date"
+    )
 
     paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
@@ -101,7 +111,9 @@ def archive_month(request, year, month):
 
     current = page_obj.number
     last = paginator.num_pages
-    page_numbers = sorted({1, current - 1, current, current + 1, last} & set(range(1, last + 1)))
+    page_numbers = sorted(
+        {1, current - 1, current, current + 1, last} & set(range(1, last + 1))
+    )
 
     # Build the list of items to render, inserting "..." for gaps.
     page_links = []
@@ -119,6 +131,7 @@ def archive_month(request, year, month):
         "page_links": page_links,
     }
     return render(request, "blog/archive_month.html", context)
+
 
 def archive_day(request, year, month, day):
     """All posts published on a given day."""
@@ -149,6 +162,7 @@ def archive_day(request, year, month, day):
     }
     return render(request, "blog/archive_day.html", context)
 
+
 def detail(request, post_id):
     if post_id > MAX_SAFE_INT:
         return not_found(request, "This post does not exist.")
@@ -160,10 +174,14 @@ def detail(request, post_id):
     comments = post.comment_set.order_by("created_date")
 
     prev_post = (
-        Post.objects.filter(pub_date__lt=post.pub_date,  pub_date__lte=timezone.now()).order_by("-pub_date").first()
+        Post.objects.filter(pub_date__lt=post.pub_date, pub_date__lte=timezone.now())
+        .order_by("-pub_date")
+        .first()
     )
     next_post = (
-        Post.objects.filter(pub_date__gt=post.pub_date,  pub_date__lte=timezone.now()).order_by("pub_date").first()
+        Post.objects.filter(pub_date__gt=post.pub_date, pub_date__lte=timezone.now())
+        .order_by("pub_date")
+        .first()
     )
 
     comment_form = CommentForm()
@@ -236,7 +254,9 @@ def edit_post(request, post_id):
             return redirect("blog:detail", post_id=post.id)
     else:
         form = PostForm(instance=post)
-    return render(request, "blog/post_form.html", {"form": form, "action": "edit", "post": post})
+    return render(
+        request, "blog/post_form.html", {"form": form, "action": "edit", "post": post}
+    )
 
 
 @user_passes_test(lambda user: user.is_superuser, login_url="blog:login")
@@ -254,7 +274,9 @@ def delete_post(request, post_id):
 
 
 def _can_modify_comment(user, comment):
-    return user.is_authenticated and (user.is_superuser or user.username == comment.author)
+    return user.is_authenticated and (
+        user.is_superuser or user.username == comment.author
+    )
 
 
 def edit_comment(request, comment_id):
@@ -284,7 +306,3 @@ def delete_comment(request, comment_id):
     comment.deleted = True
     comment.save()
     return redirect("blog:detail", post_id=comment.post.id)
-
-
-
-

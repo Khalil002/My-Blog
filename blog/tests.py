@@ -3,7 +3,8 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from .models import Post, Comment
+from .models import Post
+
 
 def create_post(post_text, days):
     """
@@ -13,6 +14,7 @@ def create_post(post_text, days):
     """
     time = timezone.now() + datetime.timedelta(days=days)
     return Post.objects.create(content=post_text, pub_date=time)
+
 
 # Create your tests here.
 class PostModelTests(TestCase):
@@ -34,7 +36,6 @@ class PostModelTests(TestCase):
         old_post = Post(pub_date=time)
         self.assertIs(old_post.was_published_recently(), False)
 
-
     def test_was_published_recently_with_recent_post(self):
         """
         was_published_recently() returns True for posts whose pub_date
@@ -43,6 +44,7 @@ class PostModelTests(TestCase):
         time = timezone.now() - datetime.timedelta(hours=23, minutes=59, seconds=59)
         recent_post = Post(pub_date=time)
         self.assertIs(recent_post.was_published_recently(), True)
+
 
 class PostIndexViewTests(TestCase):
     def test_no_posts(self):
@@ -100,6 +102,7 @@ class PostIndexViewTests(TestCase):
             response.context["latest_post_list"],
             [post2, post1],
         )
+
 
 class PostDetailViewTests(TestCase):
     def test_future_post(self):

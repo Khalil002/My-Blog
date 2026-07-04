@@ -5,8 +5,9 @@ between Jan 2020 and Dec 2025 (6 years x 12 months x 50 = 3,600 posts).
 Run with:
     python3 manage.py shell < generate_posts.py
 """
+
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.utils import timezone
 from blog.models import Post
 

@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('blog', '0002_add_post_deleted_flag'),
+        ("blog", "0002_add_post_deleted_flag"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='comment',
-            name='deleted',
+            model_name="comment",
+            name="deleted",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='comment',
-            name='edited',
+            model_name="comment",
+            name="edited",
             field=models.BooleanField(default=False),
         ),
     ]
