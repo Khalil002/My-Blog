@@ -6,15 +6,6 @@ The frontend is server-side rendered (SSR) using Django’s MVT architecture. In
 
 🔗 **See it live:** [blog.khalilcodes.com](https://blog.khalilcodes.com)
 
----
-
-## Tech Stack
-- **Backend & Template Rendering:** Django (Python)
-- **Database:** PostgreSQL
-- **Environment & Deployment:** Docker / Docker Compose
-
----
-
 ## Local Setup
 
 Want to run this project locally? As long as you have **Docker** and **Docker Compose** installed, it only takes a couple of steps.
