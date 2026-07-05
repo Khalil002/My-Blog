@@ -1,8 +1,35 @@
-My Blog is a simple blog project, it consists of a Django backend and a PostgreSQL database.
-Since I used the Django MVT (Model-View-Template) architecture, the frontend HTML is server-side-rendered, which means Django handles the frontend as well, it builds the HTML the user recieves by dynamically allocating data into the pre-defined templates.
+# My-Blog
 
-You can visit the online version on of the project on: blog.khalilcodes.com
+A straightforward blog project built using Django and PostgreSQL, fully containerized with Docker for easy deployment. 
 
-In order to run the local version of the project, you must create a .env file with the necessary environment variables. The file sample_env_file.txt contains an example of how to write the .env file.
+The frontend is server-side rendered (SSR) using Django’s MVT architecture. Instead of dealing with a separate frontend framework, Django handles the views, pulls the data from Postgres, and dynamically injects it directly into the HTML templates before serving it to the browser.
 
-After creating the .env file all you have to do is run docker compose up --build
+🔗 **See it live:** [blog.khalilcodes.com](https://blog.khalilcodes.com)
+
+---
+
+## Tech Stack
+- **Backend & Template Rendering:** Django (Python)
+- **Database:** PostgreSQL
+- **Environment & Deployment:** Docker / Docker Compose
+
+---
+
+## Local Setup
+
+Want to run this project locally? As long as you have **Docker** and **Docker Compose** installed, it only takes a couple of steps.
+
+### 1. Clone the repo
+```bash
+git clone [https://github.com/Khalil002/My-Blog.git](https://github.com/Khalil002/My-Blog.git)
+cd My-Blog
+```
+
+### 2. Create your .env file
+Create a file named .env in the root directory of the project. Use the keys provided in sample_env_file.txt as an example to write your necessary environment variables for the database and Django configurations.
+
+#### 3. Build with Docker
+Build the images and spin up both the Django app and the PostgreSQL database container by running:
+```bash
+docker compose up --build
+```
