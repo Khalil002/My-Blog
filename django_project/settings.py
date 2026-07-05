@@ -24,8 +24,10 @@ env = environ.Env(
     DEBUG=(bool, False)
 )
 
-# Read the .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+# Read the .env file if it exists (skipped in Docker where env vars are injected)
+_env_file = os.path.join(BASE_DIR, '.env')
+if os.path.exists(_env_file):
+    environ.Env.read_env(_env_file)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY=django-insecure-_2pe0r9&yu%v*11$)og$iqjbgne2gl&(g@dvo*8gd*g8i6l+!s
@@ -36,7 +38,7 @@ DEBUG = env('DEBUG')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 
 # Application definition

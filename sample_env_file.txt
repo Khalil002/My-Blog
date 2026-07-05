@@ -1,0 +1,10 @@
+DEBUG=True
+DB_NAME=db_name
+DB_USER=db_user
+DB_PASSWORD=db_password
+DB_HOST=localhost
+DB_PORT=8000
+SECRET_KEY=django_secret_key
+DJANGO_SUPERUSER_USERNAME=django_name
+DJANGO_SUPERUSER_EMAIL=your@email.com
+DJANGO_SUPERUSER_PASSWORD=django_password
