@@ -1,16 +1,35 @@
 """
-Generate script: creates ~50 lorem-ipsum posts per month for every month
-between Jan 2020 and Dec 2025 (6 years x 12 months x 50 = 3,600 posts).
+Generate sample data:
+  - 1 post per month from Jan 2000 to Nov 2025
+  - 100 posts in December 2025
+  - 5 comments from 5 different sample users on the latest post
 
-Run with:
-    python3 manage.py shell < generate_posts.py
+Safe to run multiple times — skips entirely if posts already exist.
+
+Run standalone:
+    python generate_posts.py
 """
+
+import os
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project.settings")
+django.setup()
 
 import random
 from datetime import datetime
-from django.utils import timezone
-from blog.models import Post
 
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+from blog.models import Comment, Post
+
+# ── Guard ────────────────────────────────────────────────────────────────────
+if Post.all_objects.exists():
+    print("Posts already exist — skipping sample data generation.")
+    exit(0)
+
+# ── Lorem helpers ─────────────────────────────────────────────────────────────
 LOREM_WORDS = (
     "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod "
     "tempor incididunt ut labore et dolore magna aliqua ut enim ad minim "
@@ -31,47 +50,76 @@ def lorem_title():
 
 
 def lorem_paragraph():
-    sentence_count = random.randint(3, 6)
-    sentences = []
-    for _ in range(sentence_count):
-        sentence = lorem_words(random.randint(8, 16))
-        sentences.append(sentence.capitalize() + ".")
+    sentences = [
+        lorem_words(random.randint(8, 16)).capitalize() + "."
+        for _ in range(random.randint(3, 6))
+    ]
     return " ".join(sentences)
 
 
 def lorem_content():
-    paragraph_count = random.randint(3, 5)
-    return "\n\n".join(lorem_paragraph() for _ in range(paragraph_count))
+    return "\n\n".join(lorem_paragraph() for _ in range(random.randint(3, 5)))
 
 
-POSTS_PER_MONTH = 1
+def random_pub_date(year, month):
+    if month == 12:
+        days_in_month = 31
+    else:
+        days_in_month = (datetime(year, month + 1, 1) - datetime(year, month, 1)).days
+    return timezone.make_aware(datetime(
+        year, month,
+        random.randint(1, days_in_month),
+        random.randint(0, 23),
+        random.randint(0, 59),
+        random.randint(0, 59),
+    ))
 
+
+# ── Posts: 1 per month Jan 2000 – Nov 2025 ───────────────────────────────────
 posts_to_create = []
 
 for year in range(2000, 2026):
     for month in range(1, 13):
-        # number of days in this month
-        if month == 12:
-            next_month = datetime(year + 1, 1, 1)
-        else:
-            next_month = datetime(year, month + 1, 1)
-        days_in_month = (next_month - datetime(year, month, 1)).days
+        if year == 2025 and month == 12:
+            continue  # handled separately below
+        posts_to_create.append(Post(
+            title=lorem_title(),
+            content=lorem_content(),
+            pub_date=random_pub_date(year, month),
+        ))
 
-        for _ in range(POSTS_PER_MONTH):
-            day = random.randint(1, days_in_month)
-            hour = random.randint(0, 23)
-            minute = random.randint(0, 59)
-            second = random.randint(0, 59)
-            pub_date = timezone.make_aware(
-                datetime(year, month, day, hour, minute, second)
-            )
-            posts_to_create.append(
-                Post(
-                    title=lorem_title(),
-                    content=lorem_content(),
-                    pub_date=pub_date,
-                )
-            )
+# ── Posts: 100 in December 2025 ───────────────────────────────────────────────
+for _ in range(100):
+    posts_to_create.append(Post(
+        title=lorem_title(),
+        content=lorem_content(),
+        pub_date=random_pub_date(2025, 12),
+    ))
 
-Post.objects.bulk_create(posts_to_create, batch_size=500)
+Post.all_objects.bulk_create(posts_to_create, batch_size=500)
 print(f"Created {len(posts_to_create)} posts.")
+
+# ── 5 sample users + comments on the latest post ─────────────────────────────
+SAMPLE_USERS = ["alice", "bob", "carol", "dave", "eve"]
+SAMPLE_PASSWORD = "samplepassword123"
+
+users = []
+for username in SAMPLE_USERS:
+    user, created = User.objects.get_or_create(username=username)
+    if created:
+        user.set_password(SAMPLE_PASSWORD)
+        user.save()
+    users.append(user)
+
+latest_post = Post.all_objects.order_by("-pub_date").first()
+
+comments = [
+    Comment(
+        post=latest_post,
+        author=user.username,
+        text=lorem_paragraph(),
+    )
+    for user in users
+]
+Comment.objects.bulk_create(comments)
+print(f"Created {len(comments)} comments on '{latest_post.title}'.")
